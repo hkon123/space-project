@@ -1,0 +1,30 @@
+new
+
+mars
+mass 6.4185e23
+position 0
+size 6792000
+color r
+
+new
+
+phobos
+mass 1.06e16
+position 9.3773e6
+size 223330
+color g
+
+new
+
+deimos
+mass 1.80e16
+position 23.463e6
+size 124000
+color b
+
+detailes
+
+steplength 500
+steps 10000
+
+end
