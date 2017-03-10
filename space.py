@@ -46,8 +46,13 @@ class Space(object):
 
 
     def distance(self,body1,body2,i):
-        if i==0:
+        if i==0 and body2.initialized==False:
             diff = body1.position-body2.position
+            length = math.sqrt(diff[0]**2+diff[1]**2)
+            body1.initialized = True
+            return length
+        elif i==0 and body2.initialized==True:
+            diff = body1.position-body2.position[i]
             length = math.sqrt(diff[0]**2+diff[1]**2)
             return length
         else:
@@ -70,4 +75,65 @@ class Space(object):
                 continue
             else:
                 accs = accs + self.direction(body, j, i)*(-self.G)*(j.mass/(self.distance(body, j, i))**2)
+
         return accs
+
+    def simulate(self):
+        for i in range(0,self.steps):
+            for planet in self.objects:
+                if i==0:
+                    planet.acs = self.acceleration(planet,i)
+                else:
+                    planet.acs = np.vstack((planet.acs, self.acceleration(planet,i)))
+            for planet in self.objects:
+                if i==0:
+                    planet.velocity = np.vstack((planet.velocity,planet.velocity + planet.acs*self.stepLength))
+                    planet.position = np.vstack((planet.position , planet.position + planet.velocity[i+1]*self.stepLength))
+                else:
+                    planet.position = np.vstack((planet.position, planet.position[i] + planet.velocity[i]*self.stepLength+(1.0/6.0)*(4*planet.acs[i]-planet.acs[i-1])*self.stepLength**2))
+                    if (planet.position[i,1]==0) or (planet.position[i-1,1]<0 and planet.position[i,1]>0):
+                        if planet.period == None:
+                            planet.period = float(i*self.stepLength)/(60*60*24)
+            if i!=0:
+                for planet in self.objects:
+                    tempAcs = self.acceleration(planet,i+1)
+                    planet.velocity = np.vstack((planet.velocity, planet.velocity[i] + (1.0/6.0)*(2*tempAcs+5*planet.acs[i]-planet.acs[i-1])*self.stepLength))
+
+    def init(self):
+        # initialiser for animator
+        return self.patches
+
+    def animate(self, i):
+        for j in range(0,len(self.objects)):
+            self.patches[j].center = (self.objects[j].position[i,0], self.objects[j].position[i,1])
+        return self.patches
+
+    def run(self):
+        # create plot elements
+        fig = plt.figure()
+        ax = plt.axes()
+
+        # create circle of radius 0.1 centred at initial position and add to axes
+        self.patches = []
+        for j in range(0,len(self.objects)):
+            self.patches.append(plt.Circle((self.objects[j].position[0,0], self.objects[j].position[0,1]), self.objects[j].size, color = self.objects[j].color, animated = True))
+        for i in range(0,len(self.patches)):
+            ax.add_patch(self.patches[i])
+
+        # set up the axes
+        ax.axis('scaled')
+        ax.set_xlim(-(self.objects[2].start+10**6), self.objects[2].start+10**6)
+        ax.set_ylim(-(self.objects[2].start+10**6), self.objects[2].start+10**6)
+        #ax.set_xlabel('x (rads)')
+        #ax.set_ylabel('sin(x)')
+
+        # create the animator
+        anim = FuncAnimation(fig, self.animate, init_func = self.init, frames = self.steps, repeat = False, interval = 1, blit = True)
+
+        # show the plot
+        plt.show()
+
+a= Space()
+a.simulate()
+a.run()
+print(a.objects[1].period)

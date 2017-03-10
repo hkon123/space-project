@@ -15,5 +15,6 @@ class Bodies(object):
         self.start = position
         self.position = np.array([self.start,0])
         self.velocity = None
-        self.accseleration = None
+        self.acs = None
         self.period = None
+        self.initialized = False

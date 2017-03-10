@@ -22,9 +22,9 @@ position 23.463e6
 size 124000
 color b
 
-detailes
+details
 
-steplength 500
-steps 10000
+steplength 40
+steps 12000
 
 end
