@@ -25,6 +25,8 @@ class Bodies(object):
         self.period = []
         self.initialized = False
         self.zeroed = None
+        self.zeroPoint = np.array([0,0])
+        self.zeroMark = 0
 
     def set_position(self):
         xpos = random.randrange(-self.start,self.start,1)

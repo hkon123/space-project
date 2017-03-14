@@ -44,14 +44,12 @@ class Space(object):
                         planetLength = self.distance(j,self.objects[0],0,False)
                         planetDirection = self.direction(j,self.objects[0],0)
                         self.objects[i].position = planetDirection*self.objects[i].start + planetDirection*planetLength
-                        print(self.distance(self.objects[0],j,0,False))
-                        print("\n\n"),
-                        print(self.objects[i].position)
-                        print(j.position)
+                        print(self.distance(j,self.objects[i],0,False))
         for i in self.objects:
             #speed = np.array([0,0])
             i.velocity = np.array([0,0])
             if i == self.objects[0]:
+                self.zeroPoint=np.array([0,0])
                 continue
             else:
                 i.velocity = i.velocity + math.sqrt(self.G*self.objects[0].mass/self.distance(i,self.objects[0],0,False))*self.normalize(self.direction(i,self.objects[0],0))
@@ -60,12 +58,47 @@ class Space(object):
                     if i==j or i.moon!=j.name:
                         continue
                     else:
-                        print(self.distance(j,i,0,False))
-                        print i.start
                         i.velocity = i.velocity + math.sqrt(self.G*j.mass/self.distance(j,i,0,False))*self.normalize(self.direction(i,j,0))
                     #speed += math.sqrt(self.G*j.mass/math.sqrt((i.start-j.start)**2))
             #i.velocity = np.array([0,speed])
             #i.velocity = speed
+            i.zeroPoint = self.absDirection(i.velocity,0,0)
+            print(i.zeroPoint[0])
+
+
+    def absDirection(self, vector,i,element):
+        if i==0:
+            direct = vector/math.sqrt(vector[0]**2+vector[1]**2)
+            if element==0:
+                return direct
+            elif element==1:
+                return direct[0]
+            elif element == 2:
+                return direct[1]
+        else:
+            tempVector= vector[i]
+            direct = tempVector/math.sqrt(tempVector[0]**2+tempVector[1]**2)
+            if element==0:
+                return direct
+            elif element==1:
+                return direct[0]
+            elif element == 2:
+                return direct[1]
+
+    def absLength(self,vector,i):
+        #if i==0:
+            #length = math.sqrt(vector[0]**2+vector[1]**2)
+            #return length
+        #else:
+        tempVector = vector[i]
+        length = math.sqrt(tempVector[0]**2+tempVector[1]**2)
+        return length
+
+    def energy(self,i):
+        tot = 0
+        for k in self.objects:
+            tot+= 0.5*k.mass*self.absLength(k.velocity,i)**2
+        return tot
 
 
 
@@ -135,6 +168,10 @@ class Space(object):
                         else:
                             planet.period.append(float((i-planet.zeroed)*self.stepLength)/(60*60*24))
                             planet.zeroed = i
+                    if i>2:
+                        if self.absDirection(planet.velocity,i-1,1)<planet.zeroPoint[0] and self.absDirection(planet.velocity,i-1,2)>planet.zeroPoint[1] and self.absDirection(planet.velocity,i,1)>planet.zeroPoint[0] and self.absDirection(planet.velocity,i,2)<planet.zeroPoint[1]:
+                            planet.period.append(float((i-planet.zeroMark)*self.stepLength)/(60*60*24))
+                            planet.zeroMark = i
                     #if (planet.position[i-2,0]<planet.position[i-1,0] and planet.position[i-1,0]>planet.position[i,0] and i>10):
                         #planet.period.append(float((i-1)*self.stepLength)/(60*60*24))
             if i!=0:
@@ -147,6 +184,11 @@ class Space(object):
         return self.patches
 
     def animate(self, i):
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Total kinetic energy of the system: "),
+        print(self.energy(i)),
+        print("joules")
+        print("days into the simulation: "),
         print(float((i)*self.stepLength)/(60*60*24))
         for j in range(0,len(self.objects)):
             self.patches[j].center = (self.objects[j].position[i,0], self.objects[j].position[i,1])

@@ -30,7 +30,7 @@ new
 mars
 mass 6.4185e23
 position 2.279e11
-size 679200000
+size 67920000
 color r
 moon no
 
@@ -52,10 +52,28 @@ size 1210400000
 color g
 moon no
 
+new
+
+phobos
+mass 1.06e16
+position 9.3773e6
+size 22333000
+color g
+moon mars
+
+new
+
+deimos
+mass 1.80e16
+position 23.463e6
+size 1240000
+color b
+moons mars
+
 
 details
 
-steplength 5000
+steplength 1000
 steps 32000
 
 end
