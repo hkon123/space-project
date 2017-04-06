@@ -6,7 +6,7 @@ import numpy as np
 from bodies import Bodies
 from spaceship import SpaceShip
 import os
-
+import random
 
 class Space(object):
 
@@ -28,6 +28,9 @@ class Space(object):
         self.flyby = None
         self.ships = []
         self.surfaces = []
+        self.alignements = []
+        self.alignement = None
+
 
 
         with open('info.txt','r') as f:
@@ -78,7 +81,7 @@ class Space(object):
             #i.velocity = speed
             i.zeroPoint = self.absDirection(i.velocity,0,0)
             print(i.zeroPoint[0])
-
+        self.launch = self.steps
 
     def absDirection(self, vector,i,element):
         if i==0:
@@ -150,6 +153,22 @@ class Space(object):
         x = vector[0]*math.cos(degrees) + vector[1]*math.sin(degrees)
         y = vector[1]*math.cos(degrees) - vector[0]*math.sin(degrees)
         return np.array([x,y])
+
+
+    def addRandomCelestial(self,i):
+        mass = random.randrange(10**10,10**17)
+        size = 1000000000
+        color = 'k'
+        self.objects.append(Bodies('asteroid', mass, 1, size, color, 'no', 'True', i, 100000))
+        xpos = random.randrange(-1e14,1e14)
+        ypos = random.randrange(-1e14,1e14)
+        self.objects[-1].position = np.vstack((self.objects[-1].position, np.array([xpos,ypos])))
+        self.objects[-1].position = np.vstack((self.objects[-1].position, np.array([xpos,ypos])))
+        xvel = random.randrange(-15000,15000)
+        yvel = random.randrange(-15000,15000)
+        self.objects[-1].velocity = np.vstack((self.objects[-1].velocity, np.array([xvel,yvel])))
+        self.objects[-1].acs = np.vstack((self.objects[-1].acs, self.acceleration(self.objects[-1],i-1)))
+
 
     def shipAcsOrbit(self,ship,acs,i, rotate, deg):
         for j in self.objects:
@@ -261,8 +280,11 @@ class Space(object):
                 #    self.stepLength= self.stepLength*50
                 #    self.switch = i
             if i== int(float(365*2*(60*60*24))/self.stepLength):
-                self.getShip(i,'ship.txt',10000,44.339)
+                #self.getShip(i,'ship.txt',10000,44.339)
                 self.launch = i
+            #if random.random()<0.00005:
+            #    self.addRandomCelestial(i)
+            #    print("add")
             for planet in self.objects:
                 if i==0:
                     planet.acs = self.acceleration(planet,i)
@@ -296,6 +318,7 @@ class Space(object):
                     #if (planet.position[i-2,0]<planet.position[i-1,0] and planet.position[i-1,0]>planet.position[i,0] and i>10):
                     #    planet.period.append(float((i-1)*self.stepLength)/(60*60*24))
             if i!=0:
+                self.checkAlignment(i)
                 for planet in self.objects:
                     tempAcs = self.acceleration(planet,i+1)
                     planet.velocity = np.vstack((planet.velocity, planet.velocity[i] + (1.0/6.0)*(2*tempAcs+5*planet.acs[i]-planet.acs[i-1])*self.stepLength))
@@ -306,16 +329,16 @@ class Space(object):
         return self.patches
 
     def animate(self, i):
-        #if i >2:
+        if i >2:
             #if i%(self.steps/100)==0:
             #    self.count+=1
-        #    os.system('cls' if os.name == 'nt' else 'clear')
-            #print("Total kinetic energy of the system: "),
-            #print(self.energy(i)),
-            #print("joules")
-        #    print("days into the simulation: "),
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print("Total kinetic energy of the system: "),
+            print(self.energy(i)),
+            print("joules")
+            print("days into the simulation: "),
             #if self.count<7:
-        #    print(float((i)*self.stepLength)/(60*60*24))
+            print(float((i)*self.stepLength)/(60*60*24))
         if i>self.launch:
             print("days after launch: "),
             print(float((i-self.launch)*self.stepLength)/(60*60*24))
@@ -343,8 +366,8 @@ class Space(object):
 
         # set up the axes
         ax.axis('scaled')
-        ax.set_xlim(-(self.objects[1].start+10**11), self.objects[1].start+10**11)
-        ax.set_ylim(-(self.objects[1].start+10**11), self.objects[1].start+10**11)
+        ax.set_xlim(-10**12, 10**12)
+        ax.set_ylim(-10**12, 10**12)
         #ax.set_xlabel('x (rads)')
         #ax.set_ylabel('sin(x)')
 
@@ -388,13 +411,42 @@ class Space(object):
         plt.title('plot of total kinetic energy')
         plt.show()
 
-
-
+    def checkAlignment(self,i):
+        alignementVector = self.direction(self.objects[2],self.objects[0],i)
+        tot = 0
+        aligned = 0
+        for planet in self.objects:
+            if planet.moon == 'no' and planet.ship == 'False' and planet.name!= 'sun':
+                tot+=1
+                divAngle = math.atan(float(planet.surface+10000000000)/self.distance(planet,self.objects[0],i, False))
+                posdirection = self.rotateVector(alignementVector, -divAngle)
+                negdirection = self.rotateVector(alignementVector, divAngle)
+                planetdirection = self.direction(planet,self.objects[0],i)
+                if alignementVector[0]>0 and alignementVector[1]>0:
+                    if (planetdirection[0]>posdirection[0] and planetdirection[0]<negdirection[0]):
+                        if (planetdirection[1]>negdirection[1] and planetdirection[1]<posdirection[1]):
+                            aligned +=1
+                if alignementVector[0]<0 and alignementVector[1]>0:
+                    if (planetdirection[0]>posdirection[0] and planetdirection[0]<negdirection[0]):
+                        if (planetdirection[1]<negdirection[1] and planetdirection[1]>posdirection[1]):
+                            aligned +=1
+                if alignementVector[0]<0 and alignementVector[1]<0:
+                    if (planetdirection[0]<posdirection[0] and planetdirection[0]>negdirection[0]):
+                        if (planetdirection[1]<negdirection[1] and planetdirection[1]>posdirection[1]):
+                            aligned +=1
+                if alignementVector[0]>0 and alignementVector[1]<0:
+                    if (planetdirection[0]<posdirection[0] and planetdirection[0]>negdirection[0]):
+                        if (planetdirection[1]>negdirection[1] and planetdirection[1]<posdirection[1]):
+                            aligned +=1
+        if tot == aligned:
+            self.alignements.append(i)
+            self.alignement = i
+            print("we have an alignement at" + str(float(i*self.stepLength)/(60*60*24*365))+ "years")
 
 a= Space()
 a.simulate()
 #a.run()
-a.flyBygraph(a.objects[-1],a.objects[1],a.objects[2])
+#a.flyBygraph(a.objects[-1],a.objects[1],a.objects[2])
 a.plotEnergy()
 for i in range(0,len(a.objects)):
     print(str(a.objects[i].name) +  "'s period: "),
@@ -402,7 +454,7 @@ for i in range(0,len(a.objects)):
 
 #print("time to escape earth:"),
 #print(a.escape)
-print("time to reach mars:"),
-print(a.arived)
-print("Mars fly-by distance:"),
-print("%.4g" %a.flyby)
+#print("time to reach mars:"),
+#print(a.arived)
+#print("Mars fly-by distance:"),
+#print("%.4g" %a.flyby)

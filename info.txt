@@ -20,7 +20,6 @@ moon no
 ship False
 surface 6371000
 
-
 new
 
 mars
@@ -30,11 +29,35 @@ size 6792000000
 color r
 moon no
 ship False
-surface 3390000
+surface 3397000
+
+
+new
+
+mercury
+mass 3.285e23
+position 5.791e10
+size 4880000000
+color k
+moon no
+ship False
+surface 2440000
+
+new
+
+venus
+mass 4.867e24
+position 1.082e11
+size 1210400000
+color g
+moon no
+ship False
+surface 6052000
+
 
 details
 
-steplength 1000
-steps 90000
+steplength 150000
+steps 105120
 
 end
