@@ -1,0 +1,64 @@
+new
+
+mars
+mass 6.4185e23
+position 2.279e11
+size 67920000
+color r
+moon no
+
+new
+
+mercury
+mass 3.285e23
+position 5.791e10
+size 4880000000
+color k
+moon no
+
+new
+
+venus
+mass 4.867e24
+position 1.082e11
+size 1210400000
+color g
+moon no
+
+new
+
+phobos
+mass 1.06e16
+position 9.3773e6
+size 22333000
+color g
+moon mars
+
+new
+
+deimos
+mass 1.80e16
+position 23.463e6
+size 1240000
+color b
+moons mars
+
+new
+
+moon
+mass 7.34767309e22
+position 3.84399e8
+size 17371000
+color r
+moon earth
+ship False
+
+new
+
+orbit
+mass 7000
+position 6371000
+size 1000000000
+color y
+moon earth
+ship True

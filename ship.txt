@@ -1,0 +1,12 @@
+new
+
+orbit
+mass 7000
+position 6371010
+size 1000000000
+color y
+moon earth
+ship True
+surface 100
+
+end
