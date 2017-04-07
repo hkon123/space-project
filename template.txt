@@ -1,0 +1,28 @@
+new
+
+sun
+mass 1.989e30
+position 0
+size 13914000000
+color y
+moon no
+ship False
+surface 6957000000
+
+new
+
+"name of planet
+mass 
+position 
+size 
+color 
+moon 
+ship 
+surface 
+
+details
+
+steplength 
+steps 
+
+end

@@ -5,6 +5,10 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 import random
 
+'''
+Class to hold all the information about each body in spaceship
+Takes values that determine whar kind of body it is and the bodys properties
+'''
 
 
 class Bodies(object):
@@ -40,10 +44,13 @@ class Bodies(object):
         self.zeroMark = 0
         self.orbitcount = 0
         self.orbit = False
-        self.goal = 'mars'
+        self.goal = None
 
-    def set_position(self):
+    def set_position(self):  #Method for randomizing the planets initial position in the orbit
         xpos = random.randrange(-self.start,self.start,1)
         diff = self.start**2 -xpos**2
-        ypos = math.sqrt(diff)
+        if random.random()>0.5:
+            ypos = math.sqrt(diff)
+        else:
+            ypos = -math.sqrt(diff)
         return [xpos,ypos]

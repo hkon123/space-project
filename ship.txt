@@ -8,5 +8,8 @@ color y
 moon earth
 ship True
 surface 100
+deltaV 10000
+angle 44.339
+target mars
 
 end
