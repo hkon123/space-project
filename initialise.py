@@ -35,7 +35,7 @@ class initializing(object):
                     print(np.mean(a.objects[i].period))
                 print("\n\n")
             if self.select == 3:
-                a= Space(1,2,0,0,'ship.txt',0,0,False,False,'info.txt')
+                a= Space(1,2,0,0,'ship.txt',0,0,False,False,'launchsim.txt')
                 a.simulate()
                 a.run()
                 a.flyBygraph(a.objects[-1],a.objects[1],a.objects[2])
@@ -83,9 +83,12 @@ class initializing(object):
                 os.system('cls' if os.name == 'nt' else 'clear')
                 asteroid = raw_input("add asteriods? (True/False)")
                 os.system('cls' if os.name == 'nt' else 'clear')
+                prob = float(raw_input("Probability for asteroids to be added at every timestep: (f not aplicable make 0)"))
+                os.system('cls' if os.name == 'nt' else 'clear')
                 align = raw_input("check for alignments?(True/False)")
                 os.system('cls' if os.name == 'nt' else 'clear')
                 a= Space(launches,start1,start2,start3,ship1,ship2,ship3,asteroid,align,universe)
+                a.asteroidFactor = prob
                 a.simulate()
                 a.run()
                 a.plotEnergy()

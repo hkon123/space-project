@@ -53,6 +53,7 @@ class Space(object):
         self.alignement = None
         self.crashes = []
         self.crashed = []
+        self.asteroidFactor = 0.0001
 
 
 
@@ -313,7 +314,7 @@ class Space(object):
                     self.getShip(i,self.ship3)
                     self.launch = i
             if self.addAsteriods == True:
-                if random.random()<0.00005:
+                if random.random()<self.asteroidFactor:
                     self.addRandomCelestial(i)
                     print("add")
             for planet in self.objects:
